@@ -4,6 +4,8 @@
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.VBox?>
 
 <ScrollPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="gui.MainViewController">
@@ -25,6 +27,11 @@
                 </Menu>
               </menus>
             </MenuBar>
+            <ImageView fitHeight="240.0" fitWidth="422.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@util/Gestão-de-Documentos-1.png" />
+               </image>
+            </ImageView>
          </children>
       </VBox>
    </content>
