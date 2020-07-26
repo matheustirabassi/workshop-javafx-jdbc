@@ -35,7 +35,7 @@ public class DepartmentFormController implements Initializable {
 	@FXML
 	private TextField txtName;
 	@FXML
-	private Label labelError;
+	private Label labelErrorName;
 	@FXML
 	private Button btSave;
 	@FXML
@@ -124,7 +124,7 @@ public class DepartmentFormController implements Initializable {
 		Set<String> fields = errors.keySet();
 
 		if (fields.contains("name")) {
-			labelError.setText(errors.get("name"));
+			labelErrorName.setText(errors.get("name"));
 		}
 	}
 }
