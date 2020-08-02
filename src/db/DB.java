@@ -17,7 +17,9 @@ public class DB {
 		if (conn == null) {
 			try {
 				Properties props = loadProperties();
+				// é criado o objeto da classe Properties que chama o loadProperties
 				String url = props.getProperty("dburl");
+				// recebe a url do banco de dados
 				conn = DriverManager.getConnection(url, props);
 			} catch (SQLException e) {
 				throw new DbException(e.getMessage());
@@ -38,9 +40,13 @@ public class DB {
 
 	private static Properties loadProperties() {
 		try (FileInputStream fs = new FileInputStream("db.properties")) {
+			// lê o db.properties
 			Properties props = new Properties();
+			// instancia props
 			props.load(fs);
 			return props;
+			// carrega as configurações do arquivo db.properties e retorna
+
 		} catch (IOException e) {
 			throw new DbException(e.getMessage());
 		}

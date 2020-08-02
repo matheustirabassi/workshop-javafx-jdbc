@@ -15,6 +15,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import model.services.DepartmentService;
 import model.services.SellerService;
@@ -26,7 +27,11 @@ public class MainViewController implements Initializable {
 	private MenuItem menuItemDepartment;
 	@FXML
 	private MenuItem menuItemAbout;
-
+	@FXML
+	private MenuItem menuItemSearchSellerByDepartment;
+	@FXML
+	private ImageView imageView;
+	
 	@FXML
 	public void onMenuItemSellerAction() {
 		loadView("/gui/SellerList.fxml", (SellerListController controller) -> {
@@ -42,7 +47,13 @@ public class MainViewController implements Initializable {
 			controller.updateTableView();
 		});
 	}
-
+	@FXML
+	public void onMenuItemSearchSellerByDepartment() {
+		loadView("/gui/SellerDepartmentList.fxml",(SellerDepartmentListController controller) -> {
+			controller.setService(new DepartmentService(), new SellerService());
+			controller.updateTableView();
+		} );
+	}
 	@FXML
 	public void onMenuItemAboutAction() {
 		loadView("/gui/About.fxml", x -> {
@@ -51,7 +62,6 @@ public class MainViewController implements Initializable {
 
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
-
 	}
 
 	private synchronized <T> void loadView(String absoluteName, Consumer<T> inicializingAction) {
@@ -62,10 +72,11 @@ public class MainViewController implements Initializable {
 			Scene mainScene = Main.getMainScene();
 
 			VBox mainVBox = (VBox) ((ScrollPane) mainScene.getRoot()).getContent();
-
 			Node mainMenu = mainVBox.getChildren().get(0);
+		
 			mainVBox.getChildren().clear();
 			mainVBox.getChildren().add(mainMenu);
+			
 			mainVBox.getChildren().addAll(newVBox.getChildren());
 
 			T controller = loader.getController();
@@ -74,5 +85,5 @@ public class MainViewController implements Initializable {
 			Alerts.showAlert("IOException", "Error loading view", e.getMessage(), AlertType.ERROR);
 		}
 	}
-
+	
 }

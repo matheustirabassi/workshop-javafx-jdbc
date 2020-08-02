@@ -15,7 +15,6 @@ import gui.util.Utils;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -24,6 +23,8 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -31,18 +32,16 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import model.entities.Department;
 import model.entities.Seller;
 import model.services.DepartmentService;
 import model.services.SellerService;
 
-public class SellerListController implements Initializable, DataChangeListener {
+public class SellerDepartmentListController implements Initializable, DataChangeListener {
 
-	
-	private SellerService service;
-
-	@FXML
-	private ComboBox<Department> comboBoxDepartment;
+	private SellerService sellerService;
+	private DepartmentService departmentService;
 	@FXML
 	private TableView<Seller> tableViewSeller;
 
@@ -66,25 +65,26 @@ public class SellerListController implements Initializable, DataChangeListener {
 
 	@FXML
 	private TableColumn<Seller, Seller> tableColumnREMOVE;
-
+	@FXML
+	private ComboBox<Department> comboBoxDepartment;
 	@FXML
 	private Button btNewAction;
-
-	private ObservableList<Seller> obsList;
-
+	private ObservableList<Seller> sellerObsList;
+	private ObservableList<Department> departmentObsList;
+	private List<Seller> list;
 	@FXML
-	public void onBtNewAction(ActionEvent event) {
-		Stage parentStage = Utils.currentStage(event);
-		Seller obj = new Seller();
-		createDialogForm(obj, "/gui/SellerForm.fxml", parentStage);
+	public void onBtNewAction() {
+		comboBoxDepartment.setValue(null);;
+		onDataChanged();
 	}
 
 	public void setSellerService(SellerService service) {
-		this.service = service;
+		this.sellerService = service;
 	}
 
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
+		
 		initializeNodes();
 	}
 
@@ -98,20 +98,29 @@ public class SellerListController implements Initializable, DataChangeListener {
 		Utils.formatTableColumnDouble(tableColumnBaseSalary, 2);
 		Stage stage = (Stage) Main.getMainScene().getWindow();
 		tableViewSeller.prefHeightProperty().bind(stage.heightProperty());
-
+		initializeComboBoxDepartment();
 	}
 
 	public void updateTableView() {
-		if (service == null) {
+		if (sellerService == null) {
 			throw new IllegalStateException("Service was null");
 		}
-		List<Seller> list = service.findAll();
-		obsList = FXCollections.observableArrayList(list);
-		tableViewSeller.setItems(obsList);
+		loadAssociatedObjects();
+		
+		if (comboBoxDepartment.getValue() != null) {
+			list = sellerService.findByDepartment(comboBoxDepartment.getValue());
+		}
+		else {
+			list = sellerService.findAll();
+		}
+		
+		sellerObsList = FXCollections.observableArrayList(list);
+		tableViewSeller.setItems(sellerObsList);
 		initEditButtons();
 		initRemoveButtons();
+		
 	}
-
+	
 	private void createDialogForm(Seller obj, String absoluteName, Stage parentStage) {
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource(absoluteName));
@@ -157,6 +166,7 @@ public class SellerListController implements Initializable, DataChangeListener {
 				button.setOnAction(event -> createDialogForm(obj, "/gui/SellerForm.fxml", Utils.currentStage(event)));
 			}
 		});
+
 	}
 
 	private void initRemoveButtons() {
@@ -181,15 +191,41 @@ public class SellerListController implements Initializable, DataChangeListener {
 		Optional<ButtonType> result = Alerts.showConfirmation("Confirmation", "Are you sure to delete?");
 
 		if (result.get() == ButtonType.OK) {
-			if (service == null) {
+			if (sellerService == null) {
 				throw new IllegalStateException("Service was null");
 			}
 			try {
-				service.remove(obj);
+				sellerService.remove(obj);
 				updateTableView();
 			} catch (DbIntegrityException e) {
 				Alerts.showAlert("Error removing object", null, e.getMessage(), AlertType.ERROR);
 			}
 		}
+	}
+	public void loadAssociatedObjects() {
+		if (departmentService == null) {
+			throw new IllegalStateException("Department Service has null");
+		}
+		List<Department> list = departmentService.findAll();
+		departmentObsList = FXCollections.observableArrayList(list);
+		comboBoxDepartment.setItems(departmentObsList);
+	}
+	
+	private void initializeComboBoxDepartment() {
+		Callback<ListView<Department>, ListCell<Department>> factory = lv -> new ListCell<Department>() {
+			@Override
+			protected void updateItem(Department item, boolean empty) {
+				super.updateItem(item, empty);
+				setText(empty ? "" : item.getName());
+			}
+		};
+		comboBoxDepartment.setCellFactory(factory);
+		comboBoxDepartment.setButtonCell(factory.call(null));
+	}
+
+	public void setService(DepartmentService departmentService, SellerService sellerService) {
+		this.departmentService = departmentService;
+		this.sellerService = sellerService;
+		
 	}
 }

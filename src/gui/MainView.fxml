@@ -18,6 +18,7 @@
                   <items>
                     <MenuItem fx:id="menuItemSeller" mnemonicParsing="false" onAction="#onMenuItemSellerAction" text="Seller" />
                         <MenuItem fx:id="menuItemDepartment" mnemonicParsing="false" onAction="#onMenuItemDepartmentAction" text="Department" />
+                        <MenuItem fx:id="menuItemSearchSellerByDepartment" mnemonicParsing="false" onAction="#onMenuItemSearchSellerByDepartment" text="Search Seller by department" />
                   </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Help">
@@ -27,7 +28,7 @@
                 </Menu>
               </menus>
             </MenuBar>
-            <ImageView fitHeight="240.0" fitWidth="422.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="imageView" fitHeight="281.0" fitWidth="428.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@util/Gestão-de-Documentos-1.png" />
                </image>
